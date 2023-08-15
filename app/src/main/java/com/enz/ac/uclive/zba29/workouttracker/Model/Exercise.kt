@@ -9,6 +9,6 @@ import androidx.room.PrimaryKey
 data class Exercise(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo var name: String,
+    @ColumnInfo var setNum: Int,
     @ColumnInfo var workoutId: Long,
-    var sets: List<ExerciseSet>
 )

@@ -13,6 +13,10 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
         return workoutDao.getAllWorkouts()
     }
 
+    suspend fun getWorkoutById(workoutId: Long): Workout {
+        return workoutDao.getWorkoutById(workoutId)
+    }
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insertWorkout(workout: Workout): Long {

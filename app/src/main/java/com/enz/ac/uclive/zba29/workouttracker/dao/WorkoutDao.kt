@@ -14,6 +14,9 @@ interface WorkoutDao {
     @Query("SELECT COUNT(*) FROM workout")
     fun getCount(): Flow<Int>
 
+    @Query("SELECT * FROM workout WHERE id = :workoutId")
+    suspend fun getWorkoutById(workoutId: Long) : Workout
+
     @Insert
     suspend fun insertWorkout(workout: Workout): Long
 }

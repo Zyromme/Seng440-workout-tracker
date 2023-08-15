@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 class ExerciseRepository(private val exerciseDao: ExerciseDao) {
 
+    val exercises: Flow<List<Exercise>> = exerciseDao.getAllExercise()
+
     suspend fun getExercisesForWorkout(workoutId: Long): Flow<List<Exercise>> {
         return exerciseDao.getExercisesForWorkout(workoutId)
     }

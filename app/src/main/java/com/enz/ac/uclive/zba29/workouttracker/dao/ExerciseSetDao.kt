@@ -8,8 +8,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ExerciseSetDao {
+
+    @Query("SELECT * FROM exercise_set")
+    fun getAllExerciseSets(): Flow<List<ExerciseSet>>
+
     @Query("SELECT * FROM exercise_set WHERE exerciseId = :exerciseId")
-    suspend fun getExerciseSetsForExercise(exerciseId: Long): Flow<List<ExerciseSet>>
+    fun getExerciseSetsForExercise(exerciseId: Long): Flow<List<ExerciseSet>>
 
     @Insert
     suspend fun insertExerciseSet(exerciseSet: ExerciseSet): Long
