@@ -1,6 +1,7 @@
 package com.enz.ac.uclive.zba29.workouttracker.screen
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -11,6 +12,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -40,6 +42,7 @@ fun NewWorkoutScreen(navController: NavController) {
         mutableStateOf(false)
     }
     val exerciseInputs = remember { mutableStateListOf(ExerciseInputState("", "")) }
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             TopAppBar (
@@ -56,6 +59,7 @@ fun NewWorkoutScreen(navController: NavController) {
                             workoutNameError = "This field is required"
                         }
                         else -> {
+                            Toast.makeText(context, "Sucessfully created a workout!", Toast.LENGTH_LONG).show()
                             scope.launch {
                                 submitWorkout(workoutName, exerciseInputs, navController)
                             }
@@ -99,11 +103,9 @@ fun NewWorkoutScreen(navController: NavController) {
                     exerciseInput(
                         exerciseInputState = exerciseInputState,
                         onExerciseInputChange = { newExercise ->
-                            // Handle exercise input change with index
                             exerciseInputs[index] = newExercise
                         },
                         onSetInputChange = { newSet ->
-                            // Handle set input change with index
                             exerciseInputs[index] = exerciseInputState.copy(set = newSet)
                         }
                     )

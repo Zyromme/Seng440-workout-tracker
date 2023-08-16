@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                         )
                     ) {
                             entry ->
-                        LogWorkoutScreen(workoutId = entry.arguments?.getString("workoutId"), navController)
+                        LogWorkoutScreen(workoutId = entry.arguments?.getString("workoutId"), navController = navController)
                     }
                     composable(route = Screen.HistoryScreen.route) {
                         HistoryScreen(navController = navController)

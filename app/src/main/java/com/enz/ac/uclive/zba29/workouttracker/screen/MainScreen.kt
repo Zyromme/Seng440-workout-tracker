@@ -20,14 +20,18 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
 import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
+import kotlinx.coroutines.flow.map
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "FlowOperatorInvokedInComposition")
 @Composable
 fun MainScreen(navController: NavController) {
 
-    var workouts = WorkoutLoggerApplication.workoutRepository.workouts
+//    var workouts = WorkoutLoggerApplication.workoutRepository.workouts
+    var workouts = WorkoutLoggerApplication.workoutRepository.workouts.map { workouts ->
+        workouts.filter {
+            it.date == null } }.collectAsState(emptyList())
 
     Scaffold(
         topBar = {
@@ -51,8 +55,7 @@ fun MainScreen(navController: NavController) {
         floatingActionButtonPosition = FabPosition.Center,
         isFloatingActionButtonDocked = true,
     ) {
-        val workoutList = workouts.collectAsState(emptyList())
-        WorkoutList(workoutList.value, navController)
+        WorkoutList(workouts.value, navController)
     }
 }
 
@@ -83,7 +86,7 @@ fun workoutCard(workout: Workout, navController: NavController) {
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .weight(0.6f),
-                text = "${workout.name}!",
+                text = "${workout.name}",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
