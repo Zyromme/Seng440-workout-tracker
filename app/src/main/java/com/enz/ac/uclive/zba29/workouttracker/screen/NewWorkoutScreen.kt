@@ -73,6 +73,7 @@ fun NewWorkoutScreen(navController: NavController) {
         floatingActionButtonPosition = FabPosition.Center,
         isFloatingActionButtonDocked = true,
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -95,8 +96,6 @@ fun NewWorkoutScreen(navController: NavController) {
                     style = MaterialTheme.typography.caption
                 )
             }
-
-//            PortraitExerciseInputs()
 
             Spacer(modifier = Modifier.padding(15.dp))
 
@@ -127,10 +126,6 @@ fun NewWorkoutScreen(navController: NavController) {
     }
 }
 
-//@Composable
-//fun PortraitExerciseInputs() {
-//    TODO("Not yet implemented")
-//}
 
 suspend fun submitWorkout(workoutName: String, exerciseInputs: SnapshotStateList<ExerciseInputState>, navController: NavController) {
     val workoutRepository = WorkoutLoggerApplication.workoutRepository

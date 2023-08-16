@@ -17,4 +17,5 @@
     <string name="workout_name_label">Pangalan ng Pagsasanay</string>
     <string name="new_workout_success">Matagumpay ang pag gawa ng workout!</string>
     <string name="required_field_error">Kailangan ito!</string>
+    <string name="home_button">Mag Simula</string>
 </resources>

@@ -31,7 +31,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             WorkoutTrackerTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = Screen.MainScreen.route) {
+                NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
+                    composable(route = Screen.HomeScreen.route) {
+                        HomeScreen(navController = navController)
+                    }
                     composable(route = Screen.MainScreen.route) {
                         MainScreen(navController = navController)
                     }

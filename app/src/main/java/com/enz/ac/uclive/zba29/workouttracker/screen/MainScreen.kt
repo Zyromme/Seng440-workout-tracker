@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -18,10 +19,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
 import com.enz.ac.uclive.zba29.workouttracker.R
 import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
 import kotlinx.coroutines.flow.map
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "FlowOperatorInvokedInComposition")
@@ -93,7 +96,8 @@ fun workoutCard(workout: Workout, navController: NavController) {
                 onClick = { navController.navigate(Screen.LogWorkoutScreen.withArgs(workout.id.toString())) },
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .weight(0.25f)
+                    .weight(0.25f),
+                shape = RoundedCornerShape(25.dp)
             )
             {
                 Text(stringResource(R.string.start))
