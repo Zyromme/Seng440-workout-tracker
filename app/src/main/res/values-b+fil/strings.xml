@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">WorkoutTracker</string>
+    <string name="title_activity_new_workout">NewWorkoutActivity</string>
+    <string name="title_activity_log_workout">LogWorkoutActivity</string>
+    <string name="log_table_weight_title">Bigat (kg)</string>
+    <string name="log_table_reps_title">Pag-uulit</string>
+    <string name="finish_workout">Tapusin ang Pagsasanay</string>
+    <string name="date_pattern">dd-MM-yyyy</string>
+    <string name="start">Simulan</string>
+    <string name="new_workout">Bagong Pagsasanay</string>
+    <string name="save_workout">Isantabi and Pagsasanay</string>
+    <string name="set_placeholder">0</string>
+    <string name="exercise_name_placeholder">Pangalan ng Ehersisyo</string>
+    <string name="exercise">Ehersisyo</string>
+    <string name="button_add_exercise">Dagdagan ng Ehersisyo</string>
+    <string name="empty_string"></string>
+    <string name="workout_name_label">Pangalan ng Pagsasanay</string>
+    <string name="new_workout_success">Matagumpay ang pag gawa ng workout!</string>
+    <string name="required_field_error">Kailangan ito!</string>
+</resources>

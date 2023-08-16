@@ -14,21 +14,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
+import com.enz.ac.uclive.zba29.workouttracker.R
 import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
 import kotlinx.coroutines.flow.map
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "FlowOperatorInvokedInComposition")
 @Composable
 fun MainScreen(navController: NavController) {
 
-//    var workouts = WorkoutLoggerApplication.workoutRepository.workouts
     var workouts = WorkoutLoggerApplication.workoutRepository.workouts.map { workouts ->
         workouts.filter {
             it.date == null } }.collectAsState(emptyList())
@@ -36,7 +35,7 @@ fun MainScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar (
-                title = { Text("Workout Tracker") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     IconButton(onClick = { navController.navigate(Screen.HistoryScreen.route) }) {
                         Icon(Icons.Default.CalendarMonth, null)
@@ -46,7 +45,7 @@ fun MainScreen(navController: NavController) {
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text("New Workout") },
+                text = { Text(stringResource(R.string.new_workout)) },
                 onClick = {
                     navController.navigate(Screen.NewWorkoutScreen.route)
                 }
@@ -97,7 +96,7 @@ fun workoutCard(workout: Workout, navController: NavController) {
                     .weight(0.25f)
             )
             {
-                Text(text = "Start")
+                Text(stringResource(R.string.start))
             }
         }
     }

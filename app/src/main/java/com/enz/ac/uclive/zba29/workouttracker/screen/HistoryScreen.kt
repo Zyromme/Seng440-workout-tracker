@@ -1,40 +1,45 @@
 package com.enz.ac.uclive.zba29.workouttracker.screen
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import android.content.Context
+import android.content.Intent
+
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Exercise
 import com.enz.ac.uclive.zba29.workouttracker.Model.ExerciseSet
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
+import com.enz.ac.uclive.zba29.workouttracker.R
 import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
-import com.enz.ac.uclive.zba29.workouttracker.ui.theme.Purple200
-import kotlinx.coroutines.flow.Flow
+import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication.Companion.exerciseRepository
+import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication.Companion.exerciseSetRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "FlowOperatorInvokedInComposition")
@@ -56,7 +61,7 @@ fun HistoryScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar (
-                title = { Text("Workout Tracker") },
+                title = { Text(text = stringResource(R.string.app_name)) },
                 navigationIcon = {
                     IconButton(onClick = {navController.navigate(Screen.MainScreen.route)}) {
                         Icon(Icons.Default.ArrowBack, null)
@@ -115,6 +120,8 @@ fun LogDetailDialog(
     workout: Workout,
     onDismiss:() -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val exerciseRepository = WorkoutLoggerApplication.exerciseRepository
     val exercises = remember {
         mutableStateOf<List<Exercise>>(emptyList())
@@ -141,7 +148,6 @@ fun LogDetailDialog(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .fillMaxHeight(0.7f)
-                .border(1.dp, color = Purple200, shape = RoundedCornerShape(15.dp))
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -152,83 +158,109 @@ fun LogDetailDialog(
                     modifier = Modifier.padding(12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "$workout",
-                        modifier = Modifier
-                            .weight(0.65f),
-                        style = MaterialTheme.typography.h5,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                    )
-                    Text(text = "${workout.date}",
-                        style = MaterialTheme.typography.subtitle1,
-                        modifier = Modifier.weight(0.3f))
-                }
-                for (exercise in exercises.value) {
-
-                    Column(
-                        horizontalAlignment = Alignment.Start,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 10.dp)
-                    ) {
+                    Column(modifier = Modifier
+                        .weight(0.65f)) {
                         Text(
-                            exercise.name,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier,
-                            style = MaterialTheme.typography.h6
+                            text = "$workout",
+                            style = MaterialTheme.typography.h5,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
                         )
+                        Text(text = "${workout.date}",
+                            style = MaterialTheme.typography.subtitle1)
                     }
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
+                        modifier = Modifier.weight(0.3f),
+                        horizontalAlignment = Alignment.End
                     ) {
-                        ExerciseLogTable(exercise)
+                        IconButton(onClick = {
+                            scope. launch {
+                                handleSend(workout, exercises, context)
+                            }
+                        }) {
+                            Icon(Icons.Default.Share, null)
+                        }
                     }
-
+                }
+                LazyColumn {
+                    items(exercises.value) { exercise ->
+                        Column(
+                            horizontalAlignment = Alignment.Start,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp)
+                        ) {
+                            Text(
+                                exercise.name,
+                                modifier = Modifier,
+                                style = MaterialTheme.typography.h6
+                            )
+                        }
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        ) {
+                            ExerciseLogTable(exercise)
+                        }
+                    }
                 }
             }
         }
     }
 }
 
+suspend fun handleSend(workout: Workout, exercises: MutableState<List<Exercise>>, context: Context) {
+
+    var message = "Workout: ${workout.name}\n"
+    for (exercise in exercises.value) {
+        message += " Exercise: ${exercise.name} \n"
+
+        val exerciseSets = exerciseSetRepository.getExerciseSetsForExercise(exercise.id).first()
+        exerciseSets.forEachIndexed { index, exerciseSet ->
+            message += "  Set ${index + 1}: ${exerciseSet.weight} for ${exerciseSet.reps} reps \n"
+        }
+    }
+    val sendIntent: Intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, message)
+        type = "text/plain"
+    }
+
+    val shareIntent = Intent.createChooser(sendIntent, null)
+    context.startActivity(shareIntent)
+}
+
 @Composable
 fun ExerciseLogTable(exercise: Exercise) {
     val exerciseSetRepository = WorkoutLoggerApplication.exerciseSetRepository
     var exerciseSets by remember { mutableStateOf(emptyList<ExerciseSet>()) }
-
     LaunchedEffect(exercise) {
         val exerciseSetsFlow = exerciseSetRepository.getExerciseSetsForExercise(exercise.id)
         exerciseSetsFlow.collect { collectedExerciseSets ->
             exerciseSets = collectedExerciseSets
         }
     }
-
-    LazyColumn(
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(0.7f)
+            .padding(0.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        item(exerciseSets) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .padding(0.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Weight (kg)", fontWeight = FontWeight.Bold)
-                Text("Reps", fontWeight = FontWeight.Bold)
-            }
-        }
-        items(exerciseSets) { exerciseSet ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .padding(0.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(exerciseSet.weight.toString())
-                Text(exerciseSet.reps.toString())
-            }
+        Text(stringResource(R.string.log_table_weight_title), fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.log_table_reps_title), fontWeight = FontWeight.Bold)
+    }
+    for (exerciseSet in exerciseSets) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .padding(0.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(exerciseSet.weight.toString())
+            Text(exerciseSet.reps.toString())
         }
     }
+
 }

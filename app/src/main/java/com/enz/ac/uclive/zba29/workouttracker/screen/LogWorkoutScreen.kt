@@ -1,22 +1,26 @@
 package com.enz.ac.uclive.zba29.workouttracker.screen
 
 import android.annotation.SuppressLint
+import android.provider.Settings.Global.getString
+import android.provider.Settings.Secure.getString
+import android.provider.Settings.System.getString
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.res.TypedArrayUtils.getString
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Exercise
 import com.enz.ac.uclive.zba29.workouttracker.Model.ExerciseSet
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
+import com.enz.ac.uclive.zba29.workouttracker.R
 import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
 import com.enz.ac.uclive.zba29.workouttracker.ui.theme.Typography
 import kotlinx.coroutines.flow.first
@@ -40,6 +44,8 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
     val exercises = remember {
         mutableStateOf<List<Exercise>>(emptyList())
     }
+    val dateFormatterPattern = stringResource(R.string.date_pattern)
+    var setIndex = 0
     LaunchedEffect(workoutId) {
         if (workoutId != null) {
             workout.value = workoutRepository.getWorkoutById(workoutId.toLong())
@@ -56,7 +62,7 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar (
-                title = { Text("Workout Tracker") }
+                title = { Text(stringResource(R.string.app_name)) }
             )
         },
     ) {
@@ -67,7 +73,9 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
             workout.value?.let {
                 Text(text = it.name,
                 style = Typography.h3,
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
                 textAlign = TextAlign.Center)
             }
 
@@ -77,43 +85,43 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
                         .fillMaxSize()
                         .padding(horizontal = 10.dp)
                 ) {
-                    itemsIndexed(exercises.value) { exerciseIndex, exercise ->
-                        Column {
-                            Text(text = exercise.name, style = MaterialTheme.typography.h5)
+                    item(workoutId) {
+                        var setIndex = 0
+                        for (exercise in exercises.value) {
+                            Column {
+                                Text(text = exercise.name, style = MaterialTheme.typography.h5)
 
-                            Spacer(modifier = Modifier.height(8.dp))
-                            for (setNum in 1..exercise.setNum) {
-                                val setIndex =
-                                    calculateSetIndex(exerciseIndex, setNum, exercises.value)
-                                SetRow(
-                                    setState = setStates[setIndex],
-                                    onWeightChange = { weight ->
-                                        setStates[setIndex] =
-                                            setStates[setIndex].copy(weight = weight)
-                                    },
-                                    onRepsChange = { reps ->
-                                        setStates[setIndex] = setStates[setIndex].copy(reps = reps)
-                                    }
-                                )
                                 Spacer(modifier = Modifier.height(8.dp))
-                            }
+                                for (setNum in 0 until exercise.setNum) {
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                                    SetRow(
+                                        setState = setStates[setIndex],
+                                        index = setIndex,
+                                        setStates = setStates
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    setIndex += 1
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
                         }
                     }
                 }
             }
             Box(
-                modifier = Modifier.weight(0.1f).fillMaxWidth(),
+                modifier = Modifier
+                    .weight(0.1f)
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 Button(
                     onClick = {
                         scope.launch {
-                            workout.value?.let { it1 -> submitWorkoutLog(navController, it1.name, exercises, setStates) }
+                            workout.value?.let { it1 -> submitWorkoutLog(navController, it1.name, exercises, setStates, dateFormatterPattern) }
                         }
                     }) {
-                    Text(text = "Finish Workout")
+                    Text(stringResource(R.string.finish_workout))
                 }
             }
         }
@@ -122,11 +130,12 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
 
 suspend fun submitWorkoutLog(navController: NavController,
                              workoutName: String, exercises: MutableState<List<Exercise>>,
-                             setStates: MutableList<SetState>) {
+                             setStates: MutableList<SetState>,
+                             dateFormatterPattern: String) {
     val workoutRepository = WorkoutLoggerApplication.workoutRepository
     val exerciseRepository = WorkoutLoggerApplication.exerciseRepository
     val exerciseSetRepository = WorkoutLoggerApplication.exerciseSetRepository
-    val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    val dateFormatter = DateTimeFormatter.ofPattern(dateFormatterPattern)
     val currentDate = LocalDate.now().format(dateFormatter)
     val newWorkoutLog = Workout (
         name = workoutName,
@@ -150,24 +159,16 @@ suspend fun submitWorkoutLog(navController: NavController,
                     )
             exerciseSetRepository.insertExerciseSet(newExerciseSetLog)
         }
+        counter += exercise.setNum-1
     }
     navController.navigate(Screen.HistoryScreen.route)
 }
 
-private fun calculateSetIndex(exerciseIndex: Int, setNum: Int, exercises: List<Exercise>): Int {
-    var index = 0
-    for (i in 0 until exerciseIndex) {
-        index += exercises[i].setNum
-    }
-    return index + (setNum - 1)
-}
-
-
 @Composable
 fun SetRow(
     setState: SetState,
-    onWeightChange: (Int) -> Unit,
-    onRepsChange: (Int) -> Unit
+    index: Int,
+    setStates: MutableList<SetState>
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -176,9 +177,9 @@ fun SetRow(
         TextField(
             value = setState.weight.toString(),
             onValueChange = { newValue ->
-                onWeightChange(newValue.toIntOrNull() ?: 0)
+                setStates[index] = setStates[index].copy(weight = newValue.toIntOrNull()?: 0)
             },
-            label = { Text(text = "Weight") },
+            label = { Text(stringResource(R.string.log_table_weight_title)) },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .weight(1f)
@@ -187,9 +188,9 @@ fun SetRow(
         TextField(
             value = setState.reps.toString(),
             onValueChange = { newValue ->
-                onRepsChange(newValue.toIntOrNull() ?: 0)
+                setStates[index] = setStates[index].copy(reps = newValue.toIntOrNull()?: 0)
             },
-            label = { Text(text = "Reps") },
+            label = { Text(stringResource(R.string.log_table_reps_title)) },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .weight(1f)

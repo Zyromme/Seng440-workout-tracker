@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 import androidx.navigation.NavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Exercise
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
+import com.enz.ac.uclive.zba29.workouttracker.R
 import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
 import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication.Companion.workoutRepository
 import com.enz.ac.uclive.zba29.workouttracker.viewModel.WorkoutViewModel
@@ -46,20 +48,20 @@ fun NewWorkoutScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar (
-                title = { Text("Workout Tracker") }
+                title = { Text(stringResource(R.string.app_name)) }
             )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text("Save Workout") },
+                text = { Text(stringResource(R.string.save_workout)) },
                 onClick = {
                     when {
                         workoutName.isEmpty() -> {
                             workoutNameHasError = true
-                            workoutNameError = "This field is required"
+                            workoutNameError = context.getString(R.string.required_field_error)
                         }
                         else -> {
-                            Toast.makeText(context, "Sucessfully created a workout!", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, context.getString(R.string.new_workout_success), Toast.LENGTH_LONG).show()
                             scope.launch {
                                 submitWorkout(workoutName, exerciseInputs, navController)
                             }
@@ -82,7 +84,7 @@ fun NewWorkoutScreen(navController: NavController) {
                 onValueChange = {
                     workoutName = it
                 },
-                label = { Text(text = "WorkoutName") },
+                label = { Text(stringResource(R.string.workout_name_label)) },
                 isError = workoutNameHasError,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -93,6 +95,8 @@ fun NewWorkoutScreen(navController: NavController) {
                     style = MaterialTheme.typography.caption
                 )
             }
+
+//            PortraitExerciseInputs()
 
             Spacer(modifier = Modifier.padding(15.dp))
 
@@ -117,11 +121,16 @@ fun NewWorkoutScreen(navController: NavController) {
             Button(onClick = {
                 exerciseInputs.add(ExerciseInputState("", ""))
             }) {
-                Text(text = "Add Exercise")
+                Text(stringResource(R.string.button_add_exercise))
             }
         }
     }
 }
+
+//@Composable
+//fun PortraitExerciseInputs() {
+//    TODO("Not yet implemented")
+//}
 
 suspend fun submitWorkout(workoutName: String, exerciseInputs: SnapshotStateList<ExerciseInputState>, navController: NavController) {
     val workoutRepository = WorkoutLoggerApplication.workoutRepository
@@ -166,8 +175,8 @@ fun exerciseInput(
             onValueChange = {
                 onExerciseInputChange(exerciseInputState.copy(exercise = it))
             },
-            label = { Text(text = "Excercise") },
-            placeholder = { Text(text = "Exercise Name") },
+            label = { Text(stringResource(R.string.exercise)) },
+            placeholder = { Text(stringResource(R.string.exercise_name_placeholder)) },
             maxLines = 1,
             singleLine = true
         )
@@ -176,8 +185,8 @@ fun exerciseInput(
             modifier = Modifier.weight(0.25f),
             value = exerciseInputState.set,
             onValueChange = onSetInputChange,
-            label = { Text(text = "Sets") },
-            placeholder = { Text(text = "0") },
+            label = { Text(stringResource(R.string.log_table_reps_title)) },
+            placeholder = { Text(stringResource(R.string.set_placeholder)) },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             maxLines = 1,
             singleLine = true

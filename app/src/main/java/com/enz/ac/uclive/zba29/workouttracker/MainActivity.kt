@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WorkoutTrackerTheme() {
+            WorkoutTrackerTheme {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = Screen.MainScreen.route) {
                     composable(route = Screen.MainScreen.route) {
