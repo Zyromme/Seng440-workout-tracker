@@ -50,6 +50,8 @@ fun HistoryScreen(navController: NavController) {
         workouts.filter {
             it.date != null } }.collectAsState(emptyList())
 
+    var reversedWorkouts = workouts.value.reversed()
+
     var workoutLog = remember {
         mutableStateOf<Workout?>(null)
     }
@@ -75,7 +77,7 @@ fun HistoryScreen(navController: NavController) {
                 .fillMaxWidth()
                 .padding(top = 10.dp)
                 ) {
-            items(workouts.value) { workout ->
+            items(reversedWorkouts) { workout ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
