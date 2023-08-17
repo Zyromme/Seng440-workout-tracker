@@ -89,7 +89,7 @@ fun workoutCard(workout: Workout, navController: NavController) {
             Text(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .weight(0.6f),
+                    .weight(0.65f),
                 text = "${workout.name}",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -98,7 +98,7 @@ fun workoutCard(workout: Workout, navController: NavController) {
                 onClick = { navController.navigate(Screen.LogWorkoutScreen.withArgs(workout.id.toString())) },
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .weight(0.25f),
+                    .weight(0.30f),
                 shape = RoundedCornerShape(25.dp)
             )
             {
