@@ -1,6 +1,5 @@
 package com.enz.ac.uclive.zba29.workouttracker.screen
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.VibrationEffect
@@ -19,10 +18,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -31,7 +28,7 @@ import androidx.navigation.NavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Exercise
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
 import com.enz.ac.uclive.zba29.workouttracker.R
-import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
+import com.enz.ac.uclive.zba29.workouttracker.WorkoutTrackerApplication
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -235,8 +232,8 @@ fun PortraitLayout(
 
 
 suspend fun submitWorkout(workoutName: String, exerciseInputs: SnapshotStateList<ExerciseInputState>, navController: NavController) {
-    val workoutRepository = WorkoutLoggerApplication.workoutRepository
-    val exerciseRepository = WorkoutLoggerApplication.exerciseRepository
+    val workoutRepository = WorkoutTrackerApplication.workoutRepository
+    val exerciseRepository = WorkoutTrackerApplication.exerciseRepository
     val newWorkout = Workout (
         name = workoutName
     )

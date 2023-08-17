@@ -22,7 +22,7 @@ import com.enz.ac.uclive.zba29.workouttracker.Model.Exercise
 import com.enz.ac.uclive.zba29.workouttracker.Model.ExerciseSet
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
 import com.enz.ac.uclive.zba29.workouttracker.R
-import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
+import com.enz.ac.uclive.zba29.workouttracker.WorkoutTrackerApplication
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -33,7 +33,7 @@ fun LogDetailDialog(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val exerciseRepository = WorkoutLoggerApplication.exerciseRepository
+    val exerciseRepository = WorkoutTrackerApplication.exerciseRepository
     val exercises = remember {
         mutableStateOf<List<Exercise>>(emptyList())
     }
@@ -127,7 +127,7 @@ suspend fun handleSend(workout: Workout, exercises: MutableState<List<Exercise>>
     for (exercise in exercises.value) {
         message += " Exercise: ${exercise.name} \n"
 
-        val exerciseSets = WorkoutLoggerApplication.exerciseSetRepository.getExerciseSetsForExercise(exercise.id).first()
+        val exerciseSets = WorkoutTrackerApplication.exerciseSetRepository.getExerciseSetsForExercise(exercise.id).first()
         exerciseSets.forEachIndexed { index, exerciseSet ->
             message += "  Set ${index + 1}: ${exerciseSet.weight} for ${exerciseSet.reps} reps \n"
         }
@@ -144,7 +144,7 @@ suspend fun handleSend(workout: Workout, exercises: MutableState<List<Exercise>>
 
 @Composable
 fun ExerciseLogTable(exercise: Exercise) {
-    val exerciseSetRepository = WorkoutLoggerApplication.exerciseSetRepository
+    val exerciseSetRepository = WorkoutTrackerApplication.exerciseSetRepository
     var exerciseSets by remember { mutableStateOf(emptyList<ExerciseSet>()) }
     LaunchedEffect(exercise) {
         val exerciseSetsFlow = exerciseSetRepository.getExerciseSetsForExercise(exercise.id)

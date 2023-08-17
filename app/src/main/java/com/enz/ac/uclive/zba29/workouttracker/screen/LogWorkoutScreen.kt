@@ -1,9 +1,5 @@
 package com.enz.ac.uclive.zba29.workouttracker.screen
 
-import android.annotation.SuppressLint
-import android.provider.Settings.Global.getString
-import android.provider.Settings.Secure.getString
-import android.provider.Settings.System.getString
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,13 +14,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.res.TypedArrayUtils.getString
 import androidx.navigation.NavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Exercise
 import com.enz.ac.uclive.zba29.workouttracker.Model.ExerciseSet
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
 import com.enz.ac.uclive.zba29.workouttracker.R
-import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
+import com.enz.ac.uclive.zba29.workouttracker.WorkoutTrackerApplication
 import com.enz.ac.uclive.zba29.workouttracker.ui.theme.Typography
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -38,8 +33,8 @@ data class SetState(val weight: Int, val reps: Int)
 @Composable
 fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
     val scope = rememberCoroutineScope()
-    val workoutRepository = WorkoutLoggerApplication.workoutRepository
-    val exerciseRepository = WorkoutLoggerApplication.exerciseRepository
+    val workoutRepository = WorkoutTrackerApplication.workoutRepository
+    val exerciseRepository = WorkoutTrackerApplication.exerciseRepository
     val setStates = remember { mutableStateListOf<SetState>() }
     val workout = remember {
         mutableStateOf<Workout?>(null)
@@ -48,7 +43,6 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
         mutableStateOf<List<Exercise>>(emptyList())
     }
     val dateFormatterPattern = stringResource(R.string.date_pattern)
-    var setIndex = 0
     LaunchedEffect(workoutId) {
         if (workoutId != null) {
             workout.value = workoutRepository.getWorkoutById(workoutId.toLong())
@@ -142,9 +136,9 @@ suspend fun submitWorkoutLog(navController: NavController,
                              workoutName: String, exercises: MutableState<List<Exercise>>,
                              setStates: MutableList<SetState>,
                              dateFormatterPattern: String) {
-    val workoutRepository = WorkoutLoggerApplication.workoutRepository
-    val exerciseRepository = WorkoutLoggerApplication.exerciseRepository
-    val exerciseSetRepository = WorkoutLoggerApplication.exerciseSetRepository
+    val workoutRepository = WorkoutTrackerApplication.workoutRepository
+    val exerciseRepository = WorkoutTrackerApplication.exerciseRepository
+    val exerciseSetRepository = WorkoutTrackerApplication.exerciseSetRepository
     val dateFormatter = DateTimeFormatter.ofPattern(dateFormatterPattern)
     val currentDate = LocalDate.now().format(dateFormatter)
     val newWorkoutLog = Workout (
@@ -161,15 +155,16 @@ suspend fun submitWorkoutLog(navController: NavController,
             workoutId = workoutId
                 )
         val exerciseId = exerciseRepository.insertExercise(newExerciseLog)
-        for (i in counter..counter + exercise.setNum - 1) {
+        for (i in 1.. exercise.setNum) {
             var newExerciseSetLog = ExerciseSet (
-                weight = setStates[i].weight,
-                reps = setStates[i].reps,
+                weight = setStates[counter].weight,
+                reps = setStates[counter].reps,
                 exerciseId = exerciseId
                     )
             exerciseSetRepository.insertExerciseSet(newExerciseSetLog)
+            counter += 1
         }
-        counter += exercise.setNum-1
+
     }
     navController.navigate(Screen.HistoryScreen.route)
 }

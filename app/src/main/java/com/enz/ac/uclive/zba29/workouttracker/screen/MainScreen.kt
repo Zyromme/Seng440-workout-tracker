@@ -17,12 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
 import com.enz.ac.uclive.zba29.workouttracker.R
-import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
+import com.enz.ac.uclive.zba29.workouttracker.WorkoutTrackerApplication
 import kotlinx.coroutines.flow.map
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
 @SuppressLint("FlowOperatorInvokedInComposition")
@@ -30,7 +28,7 @@ import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 @Composable
 fun MainScreen(navController: NavController) {
 
-    var workouts = WorkoutLoggerApplication.workoutRepository.workouts.map { workouts ->
+    var workouts = WorkoutTrackerApplication.workoutRepository.workouts.map { workouts ->
         workouts.filter {
             it.date == null } }.collectAsState(emptyList())
 

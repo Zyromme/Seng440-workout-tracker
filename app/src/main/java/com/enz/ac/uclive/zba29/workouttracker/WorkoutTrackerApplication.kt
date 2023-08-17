@@ -7,7 +7,7 @@ import com.enz.ac.uclive.zba29.workouttracker.repository.ExerciseRepository
 import com.enz.ac.uclive.zba29.workouttracker.repository.ExerciseSetRepository
 import com.enz.ac.uclive.zba29.workouttracker.repository.WorkoutRepository
 
-class WorkoutLoggerApplication : Application() {
+class WorkoutTrackerApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()

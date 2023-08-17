@@ -1,7 +1,6 @@
 package com.enz.ac.uclive.zba29.workouttracker.screen
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,15 +20,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.enz.ac.uclive.zba29.workouttracker.Model.Exercise
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
 import com.enz.ac.uclive.zba29.workouttracker.R
-import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
+import com.enz.ac.uclive.zba29.workouttracker.WorkoutTrackerApplication
 import com.enz.ac.uclive.zba29.workouttracker.components.LogDetailDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -39,7 +35,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HistoryScreen(navController: NavController) {
 
-    var workouts = WorkoutLoggerApplication.workoutRepository.workouts.map { workouts ->
+    var workouts = WorkoutTrackerApplication.workoutRepository.workouts.map { workouts ->
         workouts.filter {
             it.date != null } }.collectAsState(emptyList())
 
@@ -163,9 +159,9 @@ fun workoutLogCard(navController: NavController, workout: Workout, workoutLog: M
 
 suspend fun DeleteWorkoutLog(workout: Workout) {
 
-    val exerciseRepository = WorkoutLoggerApplication.exerciseRepository
-    val exerciseSetRepository = WorkoutLoggerApplication.exerciseSetRepository
-    val workoutRepository = WorkoutLoggerApplication.workoutRepository
+    val exerciseRepository = WorkoutTrackerApplication.exerciseRepository
+    val exerciseSetRepository = WorkoutTrackerApplication.exerciseSetRepository
+    val workoutRepository = WorkoutTrackerApplication.workoutRepository
 
     val exerciseFlow = exerciseRepository.getExercisesForWorkout(workout.id)
 
