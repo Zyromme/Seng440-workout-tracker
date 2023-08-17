@@ -1,6 +1,7 @@
 package com.enz.ac.uclive.zba29.workouttracker.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
@@ -19,4 +20,7 @@ interface WorkoutDao {
 
     @Insert
     suspend fun insertWorkout(workout: Workout): Long
+
+    @Query("DELETE FROM workout WHERE id = :workoutId")
+    fun deleteWorkoutById(workoutId: Long)
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -31,7 +32,7 @@ import com.enz.ac.uclive.zba29.workouttracker.R
 import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewWorkoutScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
@@ -55,7 +56,6 @@ fun NewWorkoutScreen(navController: NavController) {
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text(stringResource(R.string.save_workout)) },
                 onClick = {
                     when {
                         workoutName.isEmpty() -> {
@@ -72,29 +72,33 @@ fun NewWorkoutScreen(navController: NavController) {
                         }
                     }
                 }
-            )
+            ) {
+                Text(stringResource(R.string.save_workout))
+            }
         },
         floatingActionButtonPosition = FabPosition.Center,
-        isFloatingActionButtonDocked = true,
-    ) {
-
-        val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-        if (isLandscape) {
-            LandscapeLayout(workoutName = workoutName,
-                onWorkoutNameChange = { workoutName = it },
-                workoutNameHasError = workoutNameHasError,
-                workoutNameError = workoutNameError,
-                exerciseInputs = exerciseInputs)
-        } else {
-            PortraitLayout(
-                workoutName = workoutName,
-                onWorkoutNameChange = { workoutName = it },
-                workoutNameHasError = workoutNameHasError,
-                workoutNameError = workoutNameError,
-                exerciseInputs = exerciseInputs)
+        content = {
+            Box (
+                modifier = Modifier.padding(it)
+            ) {
+                val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+                if (isLandscape) {
+                    LandscapeLayout(workoutName = workoutName,
+                        onWorkoutNameChange = { workoutName = it },
+                        workoutNameHasError = workoutNameHasError,
+                        workoutNameError = workoutNameError,
+                        exerciseInputs = exerciseInputs)
+                } else {
+                    PortraitLayout(
+                        workoutName = workoutName,
+                        onWorkoutNameChange = { workoutName = it },
+                        workoutNameHasError = workoutNameHasError,
+                        workoutNameError = workoutNameError,
+                        exerciseInputs = exerciseInputs)
+                }
+            }
         }
-    }
+    )
 }
 
 @Composable
@@ -124,7 +128,7 @@ fun LandscapeLayout(
             Text(
                 text = workoutNameError,
                 color = Color.Red,
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.bodySmall
             )
         }
 
@@ -189,7 +193,7 @@ fun PortraitLayout(
             Text(
                 text = workoutNameError,
                 color = Color.Red,
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.bodySmall
             )
         }
 

@@ -18,4 +18,7 @@ interface ExerciseDao {
 
     @Insert
     suspend fun insertExercise(exercise: Exercise): Long
+
+    @Query("DELETE FROM exercise WHERE workoutId = :workoutId")
+    fun deleteExercisesByWorkoutId(workoutId: Long)
 }

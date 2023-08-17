@@ -2,6 +2,7 @@ package com.enz.ac.uclive.zba29.workouttracker.repository
 
 import androidx.annotation.WorkerThread
 import com.enz.ac.uclive.zba29.workouttracker.Model.Exercise
+import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
 import com.enz.ac.uclive.zba29.workouttracker.dao.ExerciseDao
 import kotlinx.coroutines.flow.Flow
 
@@ -11,6 +12,10 @@ class ExerciseRepository(private val exerciseDao: ExerciseDao) {
 
     suspend fun getExercisesForWorkout(workoutId: Long): Flow<List<Exercise>> {
         return exerciseDao.getExercisesForWorkout(workoutId)
+    }
+
+    fun deleteExercisesByWorkoutId(workoutId: Long) {
+        exerciseDao.deleteExercisesByWorkoutId(workoutId)
     }
 
     @Suppress("RedundantSuspendModifier")

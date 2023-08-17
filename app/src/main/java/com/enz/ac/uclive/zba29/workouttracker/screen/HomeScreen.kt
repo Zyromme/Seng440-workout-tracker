@@ -7,10 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material3.Button
-import androidx.compose.material3.ShapeDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,26 +20,25 @@ import androidx.navigation.NavController
 import com.airbnb.lottie.compose.*
 import com.enz.ac.uclive.zba29.workouttracker.R
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar (
-                title = { androidx.compose.material.Text(stringResource(R.string.app_name)) },
+                title = {Text(stringResource(R.string.app_name)) },
             )
         },
+        content = {
+            val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    ) {
-        val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-        if (isLandscape) {
-            LandscapeLayout(navController)
-        } else {
-            PortraitLayout(navController)
+            if (isLandscape) {
+                LandscapeLayout(navController)
+            } else {
+                PortraitLayout(navController)
+            }
         }
-    }
-
+    )
 }
 
 @Composable

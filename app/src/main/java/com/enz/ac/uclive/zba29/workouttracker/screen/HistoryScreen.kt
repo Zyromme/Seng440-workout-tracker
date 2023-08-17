@@ -1,48 +1,41 @@
 package com.enz.ac.uclive.zba29.workouttracker.screen
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
-
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.Default
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import com.enz.ac.uclive.zba29.workouttracker.Model.Exercise
-import com.enz.ac.uclive.zba29.workouttracker.Model.ExerciseSet
 import com.enz.ac.uclive.zba29.workouttracker.Model.Workout
 import com.enz.ac.uclive.zba29.workouttracker.R
 import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication
-import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication.Companion.exerciseRepository
-import com.enz.ac.uclive.zba29.workouttracker.WorkoutLoggerApplication.Companion.exerciseSetRepository
+import com.enz.ac.uclive.zba29.workouttracker.components.LogDetailDialog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalComposeUiApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "FlowOperatorInvokedInComposition")
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint( "FlowOperatorInvokedInComposition")
 @Composable
 fun HistoryScreen(navController: NavController) {
 
@@ -60,6 +53,13 @@ fun HistoryScreen(navController: NavController) {
         mutableStateOf(false)
     }
 
+    if (showLogDetail.value) {
+        workoutLog.value?.let {
+            LogDetailDialog(
+                workout = it,
+                onDismiss = { showLogDetail.value = false })
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar (
@@ -70,199 +70,117 @@ fun HistoryScreen(navController: NavController) {
                     }
                 }
             )
-        }
-    ) {
-        LazyColumn (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp)
-                ) {
-            items(reversedWorkouts) { workout ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp, vertical = 5.dp)
-                        .clickable(onClick = {
-                            workoutLog.value = workout
-                            showLogDetail.value = true
-                        }),
-                    elevation = 10.dp,
-
-                ) {
-                    Row(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "$workout",
-                            modifier = Modifier
-                                .weight(0.7f),
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                        )
-                        Text(text = "${workout.date}",
-                            modifier = Modifier.weight(0.25f))
-                    }
-                }
-            }
-        }
-    }
-    if (showLogDetail.value) {
-        workoutLog.value?.let {
-            LogDetailDialog(
-                workout = it,
-                onDismiss = { showLogDetail.value = false })
-        }
-    }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun LogDetailDialog(
-    workout: Workout,
-    onDismiss:() -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val exerciseRepository = WorkoutLoggerApplication.exerciseRepository
-    val exercises = remember {
-        mutableStateOf<List<Exercise>>(emptyList())
-    }
-
-    LaunchedEffect(workout) {
-        val exerciseFlow = exerciseRepository.getExercisesForWorkout(workout.id)
-        exerciseFlow.collect { collectedExercises ->
-            exercises.value = collectedExercises
-        }
-    }
-
-    Dialog(
-        onDismissRequest = {
-            onDismiss()
         },
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false
-        )
-    ) {
-        Card(
-            elevation = 5.dp,
-            shape = RoundedCornerShape(15.dp),
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .fillMaxHeight(0.7f)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+        content = {
+            LazyColumn (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)) {
-                Row(
-                    modifier = Modifier.padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(modifier = Modifier
-                        .weight(0.65f)) {
-                        Text(
-                            text = "$workout",
-                            style = MaterialTheme.typography.h5,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                        )
-                        Text(text = "${workout.date}",
-                            style = MaterialTheme.typography.subtitle1)
-                    }
-                    Column(
-                        modifier = Modifier.weight(0.3f),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        IconButton(onClick = {
-                            scope. launch {
-                                handleSend(workout, exercises, context)
-                            }
-                        }) {
-                            Icon(Icons.Default.Share, null)
-                        }
-                    }
-                }
-                LazyColumn {
-                    items(exercises.value) { exercise ->
-                        Column(
-                            horizontalAlignment = Alignment.Start,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 10.dp)
-                        ) {
-                            Text(
-                                exercise.name,
-                                modifier = Modifier,
-                                style = MaterialTheme.typography.h6
-                            )
-                        }
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp)
-                        ) {
-                            ExerciseLogTable(exercise)
-                        }
-                    }
+                    .padding(it)
+            ) {
+                items(reversedWorkouts) { workout ->
+                    workoutLogCard(navController = navController, workout = workout, workoutLog = workoutLog, showLogDetail = showLogDetail)
                 }
             }
         }
-    }
+    )
 }
 
-suspend fun handleSend(workout: Workout, exercises: MutableState<List<Exercise>>, context: Context) {
-
-    var message = "Workout: ${workout.name}\n"
-    for (exercise in exercises.value) {
-        message += " Exercise: ${exercise.name} \n"
-
-        val exerciseSets = exerciseSetRepository.getExerciseSetsForExercise(exercise.id).first()
-        exerciseSets.forEachIndexed { index, exerciseSet ->
-            message += "  Set ${index + 1}: ${exerciseSet.weight} for ${exerciseSet.reps} reps \n"
-        }
-    }
-    val sendIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, message)
-        type = "text/plain"
-    }
-
-    val shareIntent = Intent.createChooser(sendIntent, null)
-    context.startActivity(shareIntent)
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExerciseLogTable(exercise: Exercise) {
+fun workoutLogCard(navController: NavController, workout: Workout, workoutLog: MutableState<Workout?>, showLogDetail: MutableState<Boolean>) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val dismissState = rememberDismissState(
+        confirmValueChange = { dismissValue ->
+            when (dismissValue) {
+                DismissValue.DismissedToStart -> {
+                    scope.launch {
+                        DeleteWorkoutLog(workout)
+                    }
+                    navController.navigate(Screen.HistoryScreen.route)
+                    Toast.makeText(context, context.getString(R.string.new_workout_success), Toast.LENGTH_LONG).show()
+                }
+                else -> {}
+            }
+            true
+        }
+    )
+
+    SwipeToDismiss(
+        state = dismissState,
+        directions = setOf(DismissDirection.EndToStart),
+        background = {
+            val color = when (dismissState.dismissDirection) {
+                DismissDirection.StartToEnd -> Color.Transparent
+                DismissDirection.EndToStart -> Color.Red
+                null -> Color.Transparent
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 18.dp, vertical = 10.dp)
+                    .background(color),
+                contentAlignment = Alignment.CenterEnd,
+            ) {
+                Box(modifier = Modifier.padding(end = 10.dp)) {
+                    Icon(
+                        imageVector = Default.Delete,
+                        contentDescription = null,
+                        tint = Color.White,
+                    )
+                }
+            }
+        },
+        dismissContent = {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp, vertical = 5.dp)
+                    .clickable(onClick = {
+                        workoutLog.value = workout
+                        showLogDetail.value = true
+                    }),
+
+                ) {
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "$workout",
+                        modifier = Modifier
+                            .weight(0.65f),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                    Text(text = "${workout.date}",
+                        modifier = Modifier.weight(0.30f))
+                }
+            }
+        }
+    )
+
+}
+
+suspend fun DeleteWorkoutLog(workout: Workout) {
+
+    val exerciseRepository = WorkoutLoggerApplication.exerciseRepository
     val exerciseSetRepository = WorkoutLoggerApplication.exerciseSetRepository
-    var exerciseSets by remember { mutableStateOf(emptyList<ExerciseSet>()) }
-    LaunchedEffect(exercise) {
-        val exerciseSetsFlow = exerciseSetRepository.getExerciseSetsForExercise(exercise.id)
-        exerciseSetsFlow.collect { collectedExerciseSets ->
-            exerciseSets = collectedExerciseSets
+    val workoutRepository = WorkoutLoggerApplication.workoutRepository
+
+    val exerciseFlow = exerciseRepository.getExercisesForWorkout(workout.id)
+
+    GlobalScope.launch (Dispatchers.IO){
+        exerciseFlow.collect { exercises ->
+            for (exercise in exercises) {
+
+                exerciseSetRepository.deleteExerciseSetsByExerciseId(exercise.id)
+            }
+            exerciseRepository.deleteExercisesByWorkoutId(workout.id)
         }
     }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(0.7f)
-            .padding(0.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(stringResource(R.string.log_table_weight_title), fontWeight = FontWeight.Bold)
-        Text(stringResource(R.string.log_table_reps_title), fontWeight = FontWeight.Bold)
-    }
-    for (exerciseSet in exerciseSets) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .padding(0.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(exerciseSet.weight.toString())
-            Text(exerciseSet.reps.toString())
-        }
+    GlobalScope.launch (Dispatchers.IO){
+        workoutRepository.deleteWorkoutById(workout.id)
     }
 
 }

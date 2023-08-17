@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +32,7 @@ import java.util.*
 
 data class SetState(val weight: Int, val reps: Int)
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
     val scope = rememberCoroutineScope()
@@ -65,67 +66,69 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
                 title = { Text(stringResource(R.string.app_name)) }
             )
         },
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            workout.value?.let {
-                Text(text = it.name,
-                style = Typography.h3,
+        content = {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
-                textAlign = TextAlign.Center)
-            }
+                    .padding(it)
+            ) {
+                workout.value?.let {
+                    Text(text = it.name,
+                        style = Typography.titleLarge,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        textAlign = TextAlign.Center)
+                }
 
-            Box(modifier = Modifier.weight(0.9f)) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 10.dp)
-                ) {
-                    item(workoutId) {
-                        var setIndex = 0
-                        for (exercise in exercises.value) {
-                            Column {
-                                Text(text = exercise.name, style = MaterialTheme.typography.h5)
+                Box(modifier = Modifier.weight(0.9f)) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 10.dp)
+                    ) {
+                        item(workoutId) {
+                            var setIndex = 0
+                            for (exercise in exercises.value) {
+                                Column {
+                                    Text(text = exercise.name, style = Typography.displayMedium)
 
-                                Spacer(modifier = Modifier.height(8.dp))
-                                for (setNum in 0 until exercise.setNum) {
-
-                                    SetRow(
-                                        setState = setStates[setIndex],
-                                        index = setIndex,
-                                        setStates = setStates
-                                    )
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    setIndex += 1
-                                }
+                                    for (setNum in 0 until exercise.setNum) {
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                        SetRow(
+                                            setState = setStates[setIndex],
+                                            index = setIndex,
+                                            setStates = setStates
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        setIndex += 1
+                                    }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
                             }
                         }
                     }
                 }
-            }
-            Box(
-                modifier = Modifier
-                    .weight(0.1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    onClick = {
-                        scope.launch {
-                            workout.value?.let { it1 -> submitWorkoutLog(navController, it1.name, exercises, setStates, dateFormatterPattern) }
-                        }
-                    }) {
-                    Text(stringResource(R.string.finish_workout))
+                Box(
+                    modifier = Modifier
+                        .weight(0.1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                workout.value?.let { it1 -> submitWorkoutLog(navController, it1.name, exercises, setStates, dateFormatterPattern) }
+                            }
+                        }) {
+                        Text(stringResource(R.string.finish_workout))
+                    }
                 }
             }
         }
-    }
+    )
 }
 
 suspend fun submitWorkoutLog(navController: NavController,

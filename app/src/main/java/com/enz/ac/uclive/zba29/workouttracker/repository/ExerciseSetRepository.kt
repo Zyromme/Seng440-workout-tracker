@@ -12,6 +12,11 @@ class ExerciseSetRepository(private val exerciseSetDao: ExerciseSetDao) {
     suspend fun getExerciseSetsForExercise(exerciseId: Long): Flow<List<ExerciseSet>> {
         return exerciseSetDao.getExerciseSetsForExercise(exerciseId)
     }
+
+    fun deleteExerciseSetsByExerciseId(exerciseId: Long) {
+        exerciseSetDao.deleteExerciseSetsByExerciseId(exerciseId)
+    }
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insertExerciseSet(exerciseSet: ExerciseSet): Long {

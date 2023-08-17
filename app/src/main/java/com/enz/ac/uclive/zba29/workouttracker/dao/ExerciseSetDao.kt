@@ -17,4 +17,7 @@ interface ExerciseSetDao {
 
     @Insert
     suspend fun insertExerciseSet(exerciseSet: ExerciseSet): Long
+
+    @Query("DELETE FROM exercise_set WHERE exerciseId = :exerciseId")
+    fun deleteExerciseSetsByExerciseId(exerciseId: Long)
 }

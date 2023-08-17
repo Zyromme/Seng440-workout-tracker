@@ -13,6 +13,10 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
         return workoutDao.getAllWorkouts()
     }
 
+    fun deleteWorkoutById(workoutId: Long) {
+        workoutDao.deleteWorkoutById(workoutId)
+    }
+
     suspend fun getWorkoutById(workoutId: Long): Workout {
         return workoutDao.getWorkoutById(workoutId)
     }
