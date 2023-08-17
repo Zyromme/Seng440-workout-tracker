@@ -4,6 +4,7 @@
     <string name="title_activity_log_workout">LogWorkoutActivity</string>
     <string name="log_table_weight_title">Bigat (kg)</string>
     <string name="log_table_reps_title">Pag-uulit</string>
+    <string name="new_workout_sets_title">Beses</string>
     <string name="finish_workout">Tapusin ang Pagsasanay</string>
     <string name="date_pattern">dd-MM-yyyy</string>
     <string name="start">Simulan</string>
@@ -18,4 +19,5 @@
     <string name="new_workout_success">Matagumpay ang pag gawa ng workout!</string>
     <string name="required_field_error">Kailangan ito!</string>
     <string name="home_button">Mag Simula</string>
+    <string name="past_workouts">Dating Pagsasanay</string>
 </resources>

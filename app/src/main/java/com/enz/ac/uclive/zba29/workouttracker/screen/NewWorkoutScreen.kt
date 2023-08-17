@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -51,7 +53,12 @@ fun NewWorkoutScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar (
-                title = { Text(stringResource(R.string.app_name)) }
+                title = { Text(stringResource(R.string.app_name)) },
+                navigationIcon = {
+                    IconButton(onClick = {navController.navigate(Screen.MainScreen.route)}) {
+                        Icon(Icons.Default.ArrowBack, null)
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -280,7 +287,7 @@ fun exerciseInput(
             modifier = Modifier.weight(0.25f),
             value = exerciseInputState.set,
             onValueChange = onSetInputChange,
-            label = { Text(stringResource(R.string.log_table_reps_title)) },
+            label = { Text(stringResource(R.string.new_workout_sets_title)) },
             placeholder = { Text(stringResource(R.string.set_placeholder)) },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             maxLines = 1,

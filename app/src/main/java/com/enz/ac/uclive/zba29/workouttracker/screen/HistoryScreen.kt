@@ -63,7 +63,7 @@ fun HistoryScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar (
-                title = { Text(text = stringResource(R.string.app_name)) },
+                title = { Text(text = stringResource(R.string.past_workouts)) },
                 navigationIcon = {
                     IconButton(onClick = {navController.navigate(Screen.MainScreen.route)}) {
                         Icon(Icons.Default.ArrowBack, null)
@@ -98,7 +98,6 @@ fun workoutLogCard(navController: NavController, workout: Workout, workoutLog: M
                         DeleteWorkoutLog(workout)
                     }
                     navController.navigate(Screen.HistoryScreen.route)
-                    Toast.makeText(context, context.getString(R.string.new_workout_success), Toast.LENGTH_LONG).show()
                 }
                 else -> {}
             }

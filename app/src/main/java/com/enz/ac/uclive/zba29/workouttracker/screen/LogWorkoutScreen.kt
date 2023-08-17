@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -63,7 +65,12 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar (
-                title = { Text(stringResource(R.string.app_name)) }
+                title = { Text(stringResource(R.string.app_name)) },
+                navigationIcon = {
+                    IconButton(onClick = {navController.navigate(Screen.MainScreen.route)}) {
+                        Icon(Icons.Default.ArrowBack, null)
+                    }
+                }
             )
         },
         content = {
@@ -74,7 +81,7 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
             ) {
                 workout.value?.let {
                     Text(text = it.name,
-                        style = Typography.titleLarge,
+                        style = Typography.displaySmall,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
@@ -91,7 +98,7 @@ fun LogWorkoutScreen(workoutId: String?, navController: NavController) {
                             var setIndex = 0
                             for (exercise in exercises.value) {
                                 Column {
-                                    Text(text = exercise.name, style = Typography.displayMedium)
+                                    Text(text = exercise.name, style = Typography.titleLarge)
 
                                     Spacer(modifier = Modifier.height(8.dp))
                                     for (setNum in 0 until exercise.setNum) {
